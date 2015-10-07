@@ -1,0 +1,174 @@
+#!/bin/bash
+#   Copyright 2015 Danko Miocevic. All Rights Reserved.
+# 
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+# 
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+DISPLAY_ONLY=0
+ABREVIO_ARGS=""
+SYSTEM_LANG="en"
+DISPLAY_SIMPLE=0
+OS=""
+
+function show_usage
+{
+  echo "Abrevio CLI utility."
+  echo " "
+  echo "This utility converts URLs in Abrevio words and vice versa."
+  echo " "
+  echo "Usage: abrevio [-dhl] words/URL"
+  echo " "
+  echo "Optional parameters:"
+  echo "   -d     Display only: This option shows the URL using"
+  echo "          the standard output instead of trying to open"
+  echo "          the default browser."
+  echo "   -h     Help: Display this help message."
+  echo "   -l     Language: Set the preferred language, three"
+  echo "          languages are valid (en, es, pt)."
+  echo "   -s     Simple: Only display the result."
+  echo " "
+}
+
+function curl_not_installed
+{
+  echo "Abrevio CLI utility."
+  echo " "
+  echo "This utility converts URLs in Abrevio words and vice versa."
+  echo " "
+  echo "ERROR: curl should be installed to use this tool. "
+  echo " "
+  echo "Please visit http://curl.haxx.se/download.html to download it"
+  echo "manually or use the package manager of your preference."
+}
+
+function lang_not_specified
+{
+  echo "Abrevio CLI utility."
+  echo " "
+  echo "This utility converts URLs in Abrevio words and vice versa."
+  echo " "
+  echo "ERROR: Lang specified is not valid." 
+}
+
+# Check curl availability
+curl --help > /dev/null
+if [ $? -ne 0 ]; then
+  curl_not_installed
+  exit 1
+fi
+
+# Detect the platform
+OS="`uname`"
+case $OS in
+  'Linux')
+    OS='Linux'
+    alias ls='ls --color=auto'
+    ;;
+  'FreeBSD')
+    OS='FreeBSD'
+    alias ls='ls -G'
+    ;;
+  'WindowsNT')
+    OS='Windows'
+    ;;
+  'Darwin') 
+    OS='Mac'
+    ;;
+  'SunOS')
+    OS='Solaris'
+    ;;
+  'AIX') ;;
+  *) ;;
+esac
+
+while getopts ":dhls:" opt; do
+  case $opt in
+    d)
+      DISPLAY_ONLY=1
+      shift
+      ;;
+    h)
+      show_usage
+      exit 1
+      ;;
+    l)
+      if [ -n "$2" ]; then
+        SYSTEM_LANG=$2
+        shift 2
+      else
+        lang_not_specified
+        exit 1
+      fi
+      ;;
+    s)
+      DISPLAY_SIMPLE=1
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+  esac
+done
+
+ABREVIO_ARGS=$@
+if [ "$ABREVIO_ARGS" == "" ]; then
+  show_usage
+  exit 1
+fi
+
+# Check the language
+if [ "$SYSTEM_LANG" != "en" ] && [ "$SYSTEM_LANG" != "pt" ] && [ "$SYSTEM_LANG" != "es" ]; then
+  lang_not_specified
+  exit 1
+fi
+
+# Detect if it is a URL or not
+if [[ $ABREVIO_ARGS == *"."* ]]; then
+  ABREVIO_OUTPUT=`curl -s -X POST -H "Content-type: application/json" -X POST http://abrev.io/encode -d "
+    {
+      \"url\":\"$ABREVIO_ARGS\",
+      \"lang\":\"$SYSTEM_LANG\"
+    }
+    " | sed "s/.*\[//" | sed "s/\].*//" | sed "s/,//g" | sed 's/"//g'`
+  if [ "$DISPLAY_SIMPLE" -eq 0 ]; then
+    echo "Words: $ABREVIO_OUTPUT"
+  else
+    echo "$ABREVIO_OUTPUT"
+  fi
+else
+  ABREVIO_ARGS=`echo $ABREVIO_ARGS | sed "s/ /+/g"`
+  ABREVIO_OUTPUT=`curl -s -H "Accept: application/json" -X GET http://abrev.io/decode?w=$ABREVIO_ARGS`
+
+  if [[ $ABREVIO_OUTPUT == *"\"status\":\"ok\""* ]]; then
+    ABREVIO_OUTPUT=`echo $ABREVIO_OUTPUT | sed "s/.*\"url\":\"//" | sed "s/\"}$//"`
+    if [ "$DISPLAY_SIMPLE" -eq 0 ]; then
+      if [ "$DISPLAY_ONLY" -eq 0 ]; then
+        case $OS in
+          'Mac')
+            open $ABREVIO_OUTPUT
+            ;;
+          *)
+            echo "URL: $ABREVIO_OUTPUT"
+            ;;
+        esac
+      else
+        echo "URL: $ABREVIO_OUTPUT"
+      fi
+    else
+      echo "$ABREVIO_OUTPUT"
+    fi
+  else
+    echo "ERROR: $ABREVIO_OUTPUT"
+  fi
+fi
+
+exit 0
