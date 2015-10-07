@@ -2,6 +2,10 @@
 This is the command line shell script for Abrevio services.
 For more information please refer to [http://abrev.io](http://abrev.io).
 
+## Prerequisites ##
+The following programs should be installed before using Abrevio CLI:
+
+- cURL visit http://curl.haxx.se/download.html to download it manually or use the package manager of your preference.
 
 ## Installation ##
 Please follow these steps in order to install:
