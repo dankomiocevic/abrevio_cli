@@ -17,12 +17,14 @@ Please follow these steps in order to install:
 The Abrevio CLI is used to convert URLs in Abrevio words from the command line and to convert Abrevio words in URLs again.
 The syntax to use the tool is the following:
 
-- abrevio {-dh} words/url
+- abrevio {-dhls} words/url
 
 The parameters in brackets are optional and are used as follows:
 
-- d/display-only This parameter is used to show the result in the command line. If it is not specified the script will try to call the default browser to open the link. 
-- h/help This parameter shows the usage information.
+- d Display only: This parameter is used to show the result in the command line. If it is not specified the script will try to call the default browser to open the link. 
+- h Help: This parameter shows the usage information.
+- l Language: Set the preferred language, three languages are valid (en, es, pt).
+- s Simple: Only display the result.
 
 ## Examples ##
 The following examples will show how this Abrevio CLI can be used:
