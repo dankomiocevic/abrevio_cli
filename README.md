@@ -24,12 +24,12 @@ The parameters in brackets are optional and are used as follows:
 The following examples will show how this Abrevio CLI can be used:
 
 Generating Abrevio words for Google:
-```bash
-# abrevio http://www.google.com
+```sh
+$ abrevio http://www.google.com
 house
 ```
 
 Returning the URL in the standard output using the generated words:
-```bash
-# abrevio -d house
+```sh
+$ abrevio -d house
 ```
