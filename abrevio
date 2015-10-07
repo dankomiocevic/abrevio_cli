@@ -19,6 +19,27 @@ SYSTEM_LANG="en"
 DISPLAY_SIMPLE=0
 OS=""
 
+function set_browser
+{
+  if [ -z "$SYSTEM_BROWSER" ]; then
+    SYSTEM_BROWSER=""
+    which xdg-open > /dev/null
+    if [ $? -eq 1 ]; then
+      which gvfs-open > /dev/null
+      if [ $? -eq 1 ]; then
+        which gnome-open > /dev/null
+        if [ $? -eq 0 ]; then
+          SYSTEM_BROWSER="gnome-open"
+        fi
+      else
+        SYSTEM_BROWSER="gvfs-open"
+      fi
+    else
+      SYSTEM_BROWSER="gvfs-open"
+    fi
+  fi
+}
+
 function show_usage
 {
   echo "Abrevio CLI utility."
@@ -155,6 +176,14 @@ else
         case $OS in
           'Mac')
             open $ABREVIO_OUTPUT
+            ;;
+          'Linux')
+            set_browser
+            if [ "$SYSTEM_BROWSER" == "" ]; then
+              echo "URL: $ABREVIO_OUTPUT"
+            else
+              eval "$SYSTEM_BROWSER $ABREVIO_OUTPUT"
+            fi
             ;;
           *)
             echo "URL: $ABREVIO_OUTPUT"
