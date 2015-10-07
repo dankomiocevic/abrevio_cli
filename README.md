@@ -32,4 +32,5 @@ house
 Returning the URL in the standard output using the generated words:
 ```sh
 $ abrevio -d house
+http://www.google.com
 ```
