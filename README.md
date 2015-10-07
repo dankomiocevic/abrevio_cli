@@ -13,6 +13,12 @@ Please follow these steps in order to install:
 1. Clone this repository or download the ZIP file.
 2. Copy the abrevio file to any place defined in the PATH environment variable.
 
+The recommended way is to keep the cloned repository to update it using git and to create a symlink like this:
+
+```sh
+$ sudo ln abrevio /usr/bin/abrevio
+```
+
 ## Usage ##
 The Abrevio CLI is used to convert URLs in Abrevio words from the command line and to convert Abrevio words in URLs again.
 The syntax to use the tool is the following:
