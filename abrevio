@@ -159,15 +159,17 @@ if [[ $ABREVIO_ARGS == *"."* ]]; then
       \"url\":\"$ABREVIO_ARGS\",
       \"lang\":\"$SYSTEM_LANG\"
     }
-    " | sed "s/.*\[//" | sed "s/\].*//" | sed "s/,//g" | sed 's/"//g'`
+    " `
 
   if [[ $ABREVIO_OUTPUT == *"\"status\":\"ok\""* ]]; then
+    ABREVIO_OUTPUT=`echo $ABREVIO_OUTPUT | sed "s/.*\[//" | sed "s/\].*//" | sed "s/,//g" | sed 's/"//g'`
     if [ "$DISPLAY_SIMPLE" -eq 0 ]; then
       echo "Words: $ABREVIO_OUTPUT"
     else
       echo "$ABREVIO_OUTPUT"
     fi
   else
+    ABREVIO_OUTPUT=`echo $ABREVIO_OUTPUT | sed "s/\"/'/g"`
     echo "ERROR: $ABREVIO_OUTPUT"
   fi
 else
