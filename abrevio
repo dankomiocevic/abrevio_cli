@@ -132,6 +132,7 @@ while getopts ":dhls:" opt; do
       ;;
     s)
       DISPLAY_SIMPLE=1
+      shift
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
